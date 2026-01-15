@@ -4,7 +4,7 @@
 		"modid": "${modId}",
 		"name": "${modName}",
 		"description": "A mod that bridges NTM's fluid system and Forge's fluid system.",
-		"version": "${modVersion}",
+		"version": "1.1.0",
 		"mcversion": "${minecraftVersion}",
 		"url": "https://modrinth.com/mod/bob-fluid-translator",
 		"updateUrl": "",
@@ -13,7 +13,7 @@
 		"logoFile": "",
 		"screenshots": [],
 		"parent": "",
-		"requiredMods": [hbm],
+		"requiredMods": [],
 		"dependencies": [],
 		"dependants": [],
 		"useDependencyInformation": false
