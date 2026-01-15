@@ -1,15 +1,16 @@
 package com.ezzo.fluidtranslator.adapter;
 
+import net.minecraftforge.fluids.Fluid;
+
 import com.ezzo.fluidtranslator.ModFluidRegistry;
 import com.hbm.inventory.fluid.FluidType;
-import net.minecraftforge.fluids.Fluid;
 
 /**
  * UnifiedFluid is an abstraction layer that represents a fluid
  * in both incompatible systems:
  * <ul>
- *     <li><b>HBM</b>: uses {@link com.hbm.inventory.fluid.FluidType}</li>
- *     <li><b>Forge</b>: uses {@link net.minecraftforge.fluids.Fluid}</li>
+ * <li><b>HBM</b>: uses {@link com.hbm.inventory.fluid.FluidType}</li>
+ * <li><b>Forge</b>: uses {@link net.minecraftforge.fluids.Fluid}</li>
  * </ul>
  *
  * This class allows working with a single unified object regardless
@@ -23,6 +24,7 @@ import net.minecraftforge.fluids.Fluid;
  * both systems.
  */
 public class UnifiedFluid {
+
     private FluidType hbmFluid;
 
     private UnifiedFluid(FluidType hbmFluid) {

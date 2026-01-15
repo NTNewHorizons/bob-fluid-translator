@@ -1,12 +1,14 @@
 package com.ezzo.fluidtranslator.network;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.tileentity.TileEntity;
+
 import com.ezzo.fluidtranslator.tileentity.TileEntityHBMAdapter;
+
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
 
 /**
  * Network message sent from the client to the server to select a specific tank
@@ -20,10 +22,11 @@ import net.minecraft.tileentity.TileEntity;
  * The {@link Handler} inner class handles the server-side logic.
  */
 public class MessageSetTankIndex implements IMessage {
+
     private int x, y, z;
     private int index;
 
-    public MessageSetTankIndex() { }
+    public MessageSetTankIndex() {}
 
     public MessageSetTankIndex(int x, int y, int z, int index) {
         this.x = x;
@@ -49,6 +52,7 @@ public class MessageSetTankIndex implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<MessageSetTankIndex, IMessage> {
+
         @Override
         public IMessage onMessage(MessageSetTankIndex message, MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().playerEntity;

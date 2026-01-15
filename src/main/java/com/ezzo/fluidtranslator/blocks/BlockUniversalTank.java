@@ -1,10 +1,5 @@
 package com.ezzo.fluidtranslator.blocks;
 
-import com.ezzo.fluidtranslator.FluidTranslator;
-import com.ezzo.fluidtranslator.container.GuiIds;
-import com.ezzo.fluidtranslator.tileentity.TileEntityUniversalTank;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -12,6 +7,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+
+import com.ezzo.fluidtranslator.FluidTranslator;
+import com.ezzo.fluidtranslator.container.GuiIds;
+import com.ezzo.fluidtranslator.tileentity.TileEntityUniversalTank;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockUniversalTank extends BlockContainer {
 
@@ -38,9 +40,9 @@ public class BlockUniversalTank extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z,
-                                    EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        if(!world.isRemote) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX,
+        float hitY, float hitZ) {
+        if (!world.isRemote) {
             TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntityUniversalTank) {
                 player.openGui(FluidTranslator.instance, GuiIds.UNIVERSAL_TANK.ordinal, world, x, y, z);

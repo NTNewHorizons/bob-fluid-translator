@@ -1,12 +1,13 @@
 package com.ezzo.fluidtranslator.adapter;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+
 import com.ezzo.fluidtranslator.ModFluidRegistry;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
 
 /**
  * UnifiedFluidTank provides a unified abstraction for fluid tanks,
@@ -19,14 +20,15 @@ import net.minecraftforge.fluids.FluidStack;
  *
  * Key features:
  * <ul>
- *     <li>Acts as a fluid container with configurable capacity.</li>
- *     <li>Supports filling with {@link UnifiedFluidStack}, ensuring compatibility
- *     with both Forge and HBM fluid systems.</li>
- *     <li>Supports draining, correctly handling empty states using {@link Fluids#NONE}.</li>
- *     <li>Provides conversion methods: {@link #toHBM()} for HBM and {@link #toForge()} for Forge.</li>
+ * <li>Acts as a fluid container with configurable capacity.</li>
+ * <li>Supports filling with {@link UnifiedFluidStack}, ensuring compatibility
+ * with both Forge and HBM fluid systems.</li>
+ * <li>Supports draining, correctly handling empty states using {@link Fluids#NONE}.</li>
+ * <li>Provides conversion methods: {@link #toHBM()} for HBM and {@link #toForge()} for Forge.</li>
  * </ul>
  *
  * Usage example:
+ * 
  * <pre>
  * UnifiedFluidTank tank = new UnifiedFluidTank(4000);
  * tank.fill(UnifiedFluidStack.fromForge(waterFluid, 1000), true);
@@ -38,6 +40,7 @@ import net.minecraftforge.fluids.FluidStack;
  * needing to manage separate tank implementations manually.
  */
 public class UnifiedFluidTank {
+
     private final FluidTank hbmTank;
 
     public UnifiedFluidTank(int capacity) {
@@ -76,6 +79,7 @@ public class UnifiedFluidTank {
     /**
      * Attempts tank capacity and returns the difference between the old capacity and the new capacity.
      * Does not change capacity of old capacity is greater, in which case it returns zero.
+     * 
      * @param newSize New capacity
      * @return Difference between old capacity and new capacity
      */
@@ -84,46 +88,39 @@ public class UnifiedFluidTank {
     }
 
     public int fill(UnifiedFluidStack resource, boolean doFill) {
-        if (resource == null)
-        {
+        if (resource == null) {
             return 0;
         }
 
-        if (!doFill)
-        {
-            if (hbmTank.getTankType() == Fluids.NONE)
-            {
+        if (!doFill) {
+            if (hbmTank.getTankType() == Fluids.NONE) {
                 return Math.min(getCapacity(), resource.amount());
             }
 
-            if (hbmTank.getTankType().getID() != resource.toHBM().type.getID())
-            {
+            if (hbmTank.getTankType()
+                .getID() != resource.toHBM().type.getID()) {
                 return 0;
             }
 
             return Math.min(getCapacity() - getFill(), resource.amount());
         }
 
-        if (hbmTank.getTankType() == Fluids.NONE)
-        {
+        if (hbmTank.getTankType() == Fluids.NONE) {
             hbmTank.conform(resource.toHBM());
             hbmTank.setFill(Math.min(getCapacity(), resource.amount()));
             return getFill();
         }
 
-        if (hbmTank.getTankType().getID() != resource.toHBM().type.getID())
-        {
+        if (hbmTank.getTankType()
+            .getID() != resource.toHBM().type.getID()) {
             return 0;
         }
         int filled = getCapacity() - getFill();
 
-        if (resource.amount() < filled)
-        {
+        if (resource.amount() < filled) {
             setFill(getFill() + resource.amount());
             filled = resource.amount();
-        }
-        else
-        {
+        } else {
             setFill(getCapacity());
         }
 
@@ -131,20 +128,17 @@ public class UnifiedFluidTank {
     }
 
     public UnifiedFluidStack drain(int maxDrain, boolean doDrain) {
-        if (hbmTank.getTankType() == Fluids.NONE)
-        {
+        if (hbmTank.getTankType() == Fluids.NONE) {
             return UnifiedFluidStack.emptyStack();
         }
 
         int drained = maxDrain;
-        if (getFill() < drained)
-        {
+        if (getFill() < drained) {
             drained = getFill();
         }
 
         UnifiedFluidStack stackDrained = UnifiedFluidStack.fromHBM(hbmTank.getTankType(), drained);
-        if (doDrain)
-        {
+        if (doDrain) {
             setFill(getFill() - drained);
             if (getFill() < 0) {
                 setFill(0);
@@ -155,6 +149,7 @@ public class UnifiedFluidTank {
 
     /**
      * Changes fluid type of the tank and <b>resets fill to zero</b>
+     * 
      * @param fluid New fluid
      */
     public void setFluid(UnifiedFluid fluid) {
@@ -163,6 +158,7 @@ public class UnifiedFluidTank {
 
     /**
      * Changes fluid type of the tank and <b>resets fill to zero</b>
+     * 
      * @param fluid New fluid
      */
     public void setFluid(FluidType fluid) {
@@ -178,14 +174,21 @@ public class UnifiedFluidTank {
      *         {@code false} if the tank is not empty and holds a different fluid.
      */
     public boolean setFluidSafe(UnifiedFluid fluid) {
-        if (this.toHBM().getTankType().getID() == fluid.toHBM().getID()) return true;
+        if (this.toHBM()
+            .getTankType()
+            .getID()
+            == fluid.toHBM()
+                .getID())
+            return true;
         if (this.getFill() > 0) return false;
         else hbmTank.setTankType(fluid.toHBM());
         return true;
     }
 
     public boolean setFluidSafe(FluidType type) {
-        if (this.toHBM().getTankType().getID() == type.getID()) return true;
+        if (this.toHBM()
+            .getTankType()
+            .getID() == type.getID()) return true;
         if (this.getFill() > 0) return false;
         else hbmTank.setTankType(type);
         return true;
@@ -193,7 +196,10 @@ public class UnifiedFluidTank {
 
     public NBTTagCompound writeToNBT() {
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("fluidId", hbmTank.getTankType().getID());
+        tag.setInteger(
+            "fluidId",
+            hbmTank.getTankType()
+                .getID());
         tag.setInteger("maxFill", this.getCapacity());
         tag.setInteger("fill", this.getFill());
         return tag;

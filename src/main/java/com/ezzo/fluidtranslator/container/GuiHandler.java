@@ -1,15 +1,17 @@
 package com.ezzo.fluidtranslator.container;
 
-import com.ezzo.fluidtranslator.container.universaltank.ContainerFluidTank;
-import com.ezzo.fluidtranslator.container.universaltank.GuiFluidTank;
-import com.ezzo.fluidtranslator.container.hbmadapter.ContainerHBMAdapter;
-import com.ezzo.fluidtranslator.container.hbmadapter.GuiHBMAdapter;
-import com.ezzo.fluidtranslator.tileentity.TileEntityHBMAdapter;
-import com.ezzo.fluidtranslator.tileentity.TileEntityUniversalTank;
-import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import com.ezzo.fluidtranslator.container.hbmadapter.ContainerHBMAdapter;
+import com.ezzo.fluidtranslator.container.hbmadapter.GuiHBMAdapter;
+import com.ezzo.fluidtranslator.container.universaltank.ContainerFluidTank;
+import com.ezzo.fluidtranslator.container.universaltank.GuiFluidTank;
+import com.ezzo.fluidtranslator.tileentity.TileEntityHBMAdapter;
+import com.ezzo.fluidtranslator.tileentity.TileEntityUniversalTank;
+
+import cpw.mods.fml.common.network.IGuiHandler;
 
 public class GuiHandler implements IGuiHandler {
 

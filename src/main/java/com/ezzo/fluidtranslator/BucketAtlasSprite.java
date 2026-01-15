@@ -1,16 +1,18 @@
 package com.ezzo.fluidtranslator;
 
-import com.hbm.inventory.fluid.FluidType;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Arrays;
+
+import javax.imageio.ImageIO;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.ResourceLocation;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Arrays;
+import com.hbm.inventory.fluid.FluidType;
 
 public class BucketAtlasSprite extends TextureAtlasSprite {
 
@@ -33,18 +35,27 @@ public class BucketAtlasSprite extends TextureAtlasSprite {
             this.frameCounter = 0;
             this.tickCounter = 0;
 
-            ResourceLocation bucketLoc = new ResourceLocation(FluidTranslator.MODID + ":textures/items/generic_bucket.png");
+            ResourceLocation bucketLoc = new ResourceLocation(
+                FluidTranslator.MODID + ":textures/items/generic_bucket.png");
             ResourceLocation fluidTexture = new ResourceLocation(getTextureForFluid(this.fluid));
 
-            BufferedImage bucketBuf = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(bucketLoc).getInputStream());
-            BufferedImage fluidBuf = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(fluidTexture).getInputStream());
+            BufferedImage bucketBuf = ImageIO.read(
+                Minecraft.getMinecraft()
+                    .getResourceManager()
+                    .getResource(bucketLoc)
+                    .getInputStream());
+            BufferedImage fluidBuf = ImageIO.read(
+                Minecraft.getMinecraft()
+                    .getResourceManager()
+                    .getResource(fluidTexture)
+                    .getInputStream());
 
-//            File imgfile = new File("~/Desktop/image.png");
-//            ImageIO.write(bucketBuf, "png", imgfile);
-//            assert imgfile.length() > 0;
+            // File imgfile = new File("~/Desktop/image.png");
+            // ImageIO.write(bucketBuf, "png", imgfile);
+            // assert imgfile.length() > 0;
 
-            int[] rawBucket = new int[bucketBuf.getWidth()*bucketBuf.getHeight()];
-            int[] rawFluid = new int[fluidBuf.getWidth()*fluidBuf.getHeight()];
+            int[] rawBucket = new int[bucketBuf.getWidth() * bucketBuf.getHeight()];
+            int[] rawFluid = new int[fluidBuf.getWidth() * fluidBuf.getHeight()];
 
             bucketBuf.getRGB(0, 0, bucketBuf.getWidth(), bucketBuf.getHeight(), rawBucket, 0, bucketBuf.getWidth());
             fluidBuf.getRGB(0, 0, fluidBuf.getWidth(), fluidBuf.getHeight(), rawFluid, 0, fluidBuf.getWidth());
@@ -75,7 +86,7 @@ public class BucketAtlasSprite extends TextureAtlasSprite {
             rawBucket[154] = multiplyRGB(rawBucket[154], fluidTint);
             rawBucket[186] = multiplyRGB(rawBucket[186], fluidTint);
 
-            int size = (int)(1 + Math.log10(bucketBuf.getWidth()) / Math.log10(2));
+            int size = (int) (1 + Math.log10(bucketBuf.getWidth()) / Math.log10(2));
             int[][] mipmaps = new int[size][];
             Arrays.fill(mipmaps, rawBucket);
 
@@ -84,9 +95,12 @@ public class BucketAtlasSprite extends TextureAtlasSprite {
             this.framesTextureData.add(mipmaps);
             return false;
         } catch (IOException e) {
-            String errorMsg = "Fatal error: Unable to load texture " + location.getResourceDomain() + ":" + location.getResourcePath();
+            String errorMsg = "Fatal error: Unable to load texture " + location.getResourceDomain()
+                + ":"
+                + location.getResourcePath();
             System.err.println(errorMsg);
-            Minecraft.getMinecraft().crashed(new CrashReport(errorMsg, e));
+            Minecraft.getMinecraft()
+                .crashed(new CrashReport(errorMsg, e));
             return false;
         }
     }
@@ -120,14 +134,15 @@ public class BucketAtlasSprite extends TextureAtlasSprite {
             sumB += b;
         }
 
-        int avgR = (int)(sumR / count);
-        int avgG = (int)(sumG / count);
-        int avgB = (int)(sumB / count);
+        int avgR = (int) (sumR / count);
+        int avgG = (int) (sumG / count);
+        int avgB = (int) (sumB / count);
 
         return (avgR << 16) | (avgG << 8) | avgB;
     }
 
     private String getTextureForFluid(FluidType fluid) {
-        return "hbm:textures/gui/fluids/" + fluid.getName().toLowerCase() + ".png";
+        return "hbm:textures/gui/fluids/" + fluid.getName()
+            .toLowerCase() + ".png";
     }
 }

@@ -1,14 +1,17 @@
 package com.ezzo.fluidtranslator.blocks;
 
-import com.ezzo.fluidtranslator.ModFluidRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 
+import com.ezzo.fluidtranslator.ModFluidRegistry;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class CustomFluidBlock extends BlockFluidClassic {
+
     @SideOnly(Side.CLIENT)
     protected IIcon stillIcon;
 
@@ -22,7 +25,8 @@ public class CustomFluidBlock extends BlockFluidClassic {
 
     @Override
     public String getLocalizedName() {
-        return ModFluidRegistry.getHBMFluid(fluid).getLocalizedName();
+        return ModFluidRegistry.getHBMFluid(fluid)
+            .getLocalizedName();
     }
 
     @Override

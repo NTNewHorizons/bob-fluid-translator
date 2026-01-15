@@ -3,6 +3,7 @@ package com.ezzo.fluidtranslator.blocks;
 import net.minecraft.block.Block;
 
 public class ModBlocks {
+
     public static Block universalTank;
     public static Block universalTankLarge;
     public static Block hbmAdapter;

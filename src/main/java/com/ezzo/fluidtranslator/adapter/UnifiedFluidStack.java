@@ -1,17 +1,18 @@
 package com.ezzo.fluidtranslator.adapter;
 
+import net.minecraftforge.fluids.Fluid;
+
 import com.ezzo.fluidtranslator.ModFluidRegistry;
 import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
-import net.minecraftforge.fluids.Fluid;
 
 /**
  * UnifiedFluidStack represents a fluid-stack in a unified way,
  * bridging the gap between two incompatible systems:
  * <ul>
- *     <li><b>HBM</b>: uses {@link com.hbm.inventory.FluidStack}</li>
- *     <li><b>Forge</b>: uses {@link net.minecraftforge.fluids.FluidStack}</li>
+ * <li><b>HBM</b>: uses {@link com.hbm.inventory.FluidStack}</li>
+ * <li><b>Forge</b>: uses {@link net.minecraftforge.fluids.FluidStack}</li>
  * </ul>
  *
  * Internally, it stores the HBM {@link FluidStack} as the "source of truth".
@@ -23,15 +24,16 @@ import net.minecraftforge.fluids.Fluid;
  *
  * Typical usage:
  * <ul>
- *     <li>Create a new stack from Forge with {@link #fromForge(Fluid, int)}</li>
- *     <li>Create a new stack from HBM with {@link #fromHBM(FluidType, int)}</li>
- *     <li>Convert back with {@link #toForge()} or {@link #toHBM()}</li>
+ * <li>Create a new stack from Forge with {@link #fromForge(Fluid, int)}</li>
+ * <li>Create a new stack from HBM with {@link #fromHBM(FluidType, int)}</li>
+ * <li>Convert back with {@link #toForge()} or {@link #toHBM()}</li>
  * </ul>
  *
  * An "empty" stack is represented by {@link Fluids#NONE} and amount 0,
  * accessible through {@link #emptyStack()}.
  */
 public class UnifiedFluidStack {
+
     private com.hbm.inventory.FluidStack hbmFluidStack;
 
     private UnifiedFluidStack(UnifiedFluid fluid, int amount) {
@@ -71,10 +73,12 @@ public class UnifiedFluidStack {
     }
 
     public net.minecraftforge.fluids.FluidStack toForge() {
-        if(isEmpty()) {
+        if (isEmpty()) {
             return null;
         }
-        return new net.minecraftforge.fluids.FluidStack(ModFluidRegistry.getForgeFluid(hbmFluidStack.type), hbmFluidStack.fill);
+        return new net.minecraftforge.fluids.FluidStack(
+            ModFluidRegistry.getForgeFluid(hbmFluidStack.type),
+            hbmFluidStack.fill);
     }
 
     public UnifiedFluid getFluid() {

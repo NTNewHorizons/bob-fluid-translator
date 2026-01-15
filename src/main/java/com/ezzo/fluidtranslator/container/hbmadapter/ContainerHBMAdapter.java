@@ -1,25 +1,23 @@
 package com.ezzo.fluidtranslator.container.hbmadapter;
 
-import com.ezzo.fluidtranslator.tileentity.TileEntityHBMAdapter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import com.ezzo.fluidtranslator.tileentity.TileEntityHBMAdapter;
+
 public class ContainerHBMAdapter extends Container {
 
     public ContainerHBMAdapter(InventoryPlayer playerInv, TileEntityHBMAdapter tank) {
-        for (int i = 0; i < 3; ++i)
-        {
-            for (int j = 0; j < 9; ++j)
-            {
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 9; ++j) {
                 this.addSlotToContainer(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
-        for (int i = 0; i < 9; ++i)
-        {
+        for (int i = 0; i < 9; ++i) {
             this.addSlotToContainer(new Slot(playerInv, i, 8 + i * 18, 142));
         }
     }
@@ -32,7 +30,7 @@ public class ContainerHBMAdapter extends Container {
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
         ItemStack itemstackCopy = null;
-        Slot slot = (Slot)inventorySlots.get(index);
+        Slot slot = (Slot) inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();

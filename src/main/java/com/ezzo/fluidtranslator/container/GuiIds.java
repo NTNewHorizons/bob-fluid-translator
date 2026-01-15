@@ -1,6 +1,7 @@
 package com.ezzo.fluidtranslator.container;
 
 public enum GuiIds {
+
     UNIVERSAL_TANK(0),
     HBM_ADAPTER(1);
 

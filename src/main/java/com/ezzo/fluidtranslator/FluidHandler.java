@@ -1,19 +1,21 @@
 package com.ezzo.fluidtranslator;
 
-import api.hbm.fluidmk2.IFluidStandardReceiverMK2;
-import api.hbm.fluidmk2.IFluidStandardSenderMK2;
-import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
-import com.hbm.blocks.BlockDummyable;
-import com.hbm.inventory.fluid.FluidType;
-import com.hbm.inventory.fluid.tank.FluidTank;
-import com.hbm.util.fauxpointtwelve.BlockPos;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import com.hbm.blocks.BlockDummyable;
+import com.hbm.inventory.fluid.FluidType;
+import com.hbm.inventory.fluid.tank.FluidTank;
+import com.hbm.util.fauxpointtwelve.BlockPos;
+
+import api.hbm.fluidmk2.IFluidStandardReceiverMK2;
+import api.hbm.fluidmk2.IFluidStandardSenderMK2;
+import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
 
 /**
  * Utility class that encapsulates both {@link IFluidStandardSenderMK2} and
@@ -30,11 +32,11 @@ import java.util.List;
  */
 
 public class FluidHandler {
+
     private IFluidStandardSenderMK2 sender;
     private IFluidStandardReceiverMK2 receiver;
 
-    public FluidHandler() {
-    }
+    public FluidHandler() {}
 
     public FluidHandler(IFluidStandardSenderMK2 sender) {
         this.sender = sender;
@@ -48,7 +50,6 @@ public class FluidHandler {
         this.sender = sender;
         this.receiver = receiver;
     }
-
 
     public long getFluidAvailable(FluidType type, int pressure) {
         if (sender != null) return sender.getFluidAvailable(type, pressure);
@@ -105,9 +106,11 @@ public class FluidHandler {
     /**
      * Attempts to locate the core tile ({@link IFluidStandardReceiverMK2}) of a multiblock machine from any
      * of its tiles
+     * 
      * @param world World where the machine is located
-     * @param tile Position of a tile that makes up the multiblock
-     * @return The {@link TileEntity} which implements {@link IFluidStandardReceiverMK2} if found, {@code null} if not found
+     * @param tile  Position of a tile that makes up the multiblock
+     * @return The {@link TileEntity} which implements {@link IFluidStandardReceiverMK2} if found, {@code null} if not
+     *         found
      */
     public TileEntity findReceiver(World world, BlockPos tile) {
         TileEntity neighborTile = world.getTileEntity(tile.getX(), tile.getY(), tile.getZ());
@@ -137,9 +140,11 @@ public class FluidHandler {
     /**
      * Attempts to locate the core tile ({@link IFluidStandardSenderMK2}) of a multiblock machine from any
      * of its tiles
+     * 
      * @param world World where the machine is located
-     * @param tile Position of a tile that makes up the multiblock
-     * @return The {@link TileEntity} which implements {@link IFluidStandardSenderMK2} if found, {@code null} if not found
+     * @param tile  Position of a tile that makes up the multiblock
+     * @return The {@link TileEntity} which implements {@link IFluidStandardSenderMK2} if found, {@code null} if not
+     *         found
      */
     public TileEntity findSender(World world, BlockPos tile) {
         TileEntity neighborTile = world.getTileEntity(tile.getX(), tile.getY(), tile.getZ());

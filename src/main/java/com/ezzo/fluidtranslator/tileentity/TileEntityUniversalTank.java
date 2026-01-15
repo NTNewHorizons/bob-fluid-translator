@@ -1,7 +1,20 @@
 package com.ezzo.fluidtranslator.tileentity;
 
-import api.hbm.fluidmk2.FluidNode;
-import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
+import java.util.HashSet;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.*;
+
 import com.ezzo.fluidtranslator.ModFluidRegistry;
 import com.ezzo.fluidtranslator.TankModes;
 import com.ezzo.fluidtranslator.adapter.UnifiedFluid;
@@ -17,26 +30,17 @@ import com.hbm.tileentity.TileEntityLoadedBase;
 import com.hbm.uninos.UniNodespace;
 import com.hbm.util.fauxpointtwelve.BlockPos;
 import com.hbm.util.fauxpointtwelve.DirPos;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.*;
 
-import javax.annotation.Nullable;
-import java.util.HashSet;
+import api.hbm.fluidmk2.FluidNode;
+import api.hbm.fluidmk2.IFluidStandardTransceiverMK2;
 
-public class TileEntityUniversalTank extends TileEntityLoadedBase implements IInventory, IFluidStandardTransceiverMK2, IFluidHandler {
+public class TileEntityUniversalTank extends TileEntityLoadedBase
+    implements IInventory, IFluidStandardTransceiverMK2, IFluidHandler {
 
     protected FluidNode node;
     protected FluidType lastType = Fluids.NONE;
     public UnifiedFluidTank tank;
-    private short mode = (short)TankModes.DISABLED.ordinal;
+    private short mode = (short) TankModes.DISABLED.ordinal;
     private final ItemStack[] slots = new ItemStack[2];
 
     // Used to add a delay between transfer operations with items
@@ -69,17 +73,15 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
     @Override
     public FluidTank[] getSendingTanks() {
         if (mode == TankModes.BUFFER.ordinal || mode == TankModes.SENDER.ordinal)
-            return new FluidTank[] {tank.toHBM()};
-        else
-            return new FluidTank[0];
+            return new FluidTank[] { tank.toHBM() };
+        else return new FluidTank[0];
     }
 
     @Override
     public FluidTank[] getReceivingTanks() {
         if (mode == TankModes.BUFFER.ordinal || mode == TankModes.RECEIVER.ordinal)
-            return new FluidTank[] {tank.toHBM()};
-        else
-            return new FluidTank[0];
+            return new FluidTank[] { tank.toHBM() };
+        else return new FluidTank[0];
     }
 
     @Override
@@ -89,9 +91,11 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
 
     @Override
     public long getDemand(FluidType type, int pressure) {
-        if(this.mode == TankModes.SENDER.ordinal || this.mode == TankModes.DISABLED.ordinal) return 0;
-        if(tank.toHBM().getPressure() != pressure) return 0;
-        return type == tank.toHBM().getTankType() ? tank.getCapacity() - tank.getFill() : 0;
+        if (this.mode == TankModes.SENDER.ordinal || this.mode == TankModes.DISABLED.ordinal) return 0;
+        if (tank.toHBM()
+            .getPressure() != pressure) return 0;
+        return type == tank.toHBM()
+            .getTankType() ? tank.getCapacity() - tank.getFill() : 0;
     }
 
     @Override
@@ -101,13 +105,13 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
 
     public long transferFluid(FluidType type, int pressure, long amount) {
         int tanks = 0;
-        for(FluidTank tank : getReceivingTanks()) {
-            if(tank.getTankType() == type && tank.getPressure() == pressure) tanks++;
+        for (FluidTank tank : getReceivingTanks()) {
+            if (tank.getTankType() == type && tank.getPressure() == pressure) tanks++;
         }
-        if(tanks > 1) {
+        if (tanks > 1) {
             int firstRound = (int) Math.floor((double) amount / (double) tanks);
-            for(FluidTank tank : getReceivingTanks()) {
-                if(tank.getTankType() == type && tank.getPressure() == pressure) {
+            for (FluidTank tank : getReceivingTanks()) {
+                if (tank.getTankType() == type && tank.getPressure() == pressure) {
                     int toAdd = Math.min(firstRound, tank.getMaxFill() - tank.getFill());
                     tank.setFill(tank.getFill() + toAdd);
                     amount -= toAdd;
@@ -115,8 +119,8 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
             }
             this.markDirtyAndUpdate();
         }
-        if(amount > 0) for(FluidTank tank : getReceivingTanks()) {
-            if(tank.getTankType() == type && tank.getPressure() == pressure) {
+        if (amount > 0) for (FluidTank tank : getReceivingTanks()) {
+            if (tank.getTankType() == type && tank.getPressure() == pressure) {
                 int toAdd = (int) Math.min(amount, tank.getMaxFill() - tank.getFill());
                 tank.setFill(tank.getFill() + toAdd);
                 amount -= toAdd;
@@ -128,21 +132,21 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
 
     public long getFluidAvailable(FluidType type, int pressure) {
         long amount = 0;
-        for(FluidTank tank : getSendingTanks()) {
-            if(tank.getTankType() == type && tank.getPressure() == pressure) amount += tank.getFill();
+        for (FluidTank tank : getSendingTanks()) {
+            if (tank.getTankType() == type && tank.getPressure() == pressure) amount += tank.getFill();
         }
         return amount;
     }
 
     public void useUpFluid(FluidType type, int pressure, long amount) {
         int tanks = 0;
-        for(FluidTank tank : getSendingTanks()) {
-            if(tank.getTankType() == type && tank.getPressure() == pressure) tanks++;
+        for (FluidTank tank : getSendingTanks()) {
+            if (tank.getTankType() == type && tank.getPressure() == pressure) tanks++;
         }
-        if(tanks > 1) {
+        if (tanks > 1) {
             int firstRound = (int) Math.floor((double) amount / (double) tanks);
-            for(FluidTank tank : getSendingTanks()) {
-                if(tank.getTankType() == type && tank.getPressure() == pressure) {
+            for (FluidTank tank : getSendingTanks()) {
+                if (tank.getTankType() == type && tank.getPressure() == pressure) {
                     int toRem = Math.min(firstRound, tank.getFill());
                     tank.setFill(tank.getFill() - toRem);
                     amount -= toRem;
@@ -150,8 +154,8 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
             }
             this.markDirtyAndUpdate();
         }
-        if(amount > 0) for(FluidTank tank : getSendingTanks()) {
-            if(tank.getTankType() == type && tank.getPressure() == pressure) {
+        if (amount > 0) for (FluidTank tank : getSendingTanks()) {
+            if (tank.getTankType() == type && tank.getPressure() == pressure) {
                 int toRem = (int) Math.min(amount, tank.getFill());
                 tank.setFill(tank.getFill() - toRem);
                 amount -= toRem;
@@ -161,62 +165,95 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
     }
 
     protected DirPos[] getConPos() {
-        return new DirPos[] {
-                new DirPos(xCoord + 1, yCoord, zCoord, Library.POS_X),
-                new DirPos(xCoord - 1, yCoord, zCoord, Library.NEG_X),
-                new DirPos(xCoord, yCoord + 1, zCoord, Library.POS_Y),
-                new DirPos(xCoord, yCoord - 1, zCoord, Library.NEG_Y),
-                new DirPos(xCoord, yCoord, zCoord + 1, Library.POS_Z),
-                new DirPos(xCoord, yCoord, zCoord - 1, Library.NEG_Z)
-        };
+        return new DirPos[] { new DirPos(xCoord + 1, yCoord, zCoord, Library.POS_X),
+            new DirPos(xCoord - 1, yCoord, zCoord, Library.NEG_X),
+            new DirPos(xCoord, yCoord + 1, zCoord, Library.POS_Y),
+            new DirPos(xCoord, yCoord - 1, zCoord, Library.NEG_Y),
+            new DirPos(xCoord, yCoord, zCoord + 1, Library.POS_Z),
+            new DirPos(xCoord, yCoord, zCoord - 1, Library.NEG_Z) };
     }
 
     /**
      * This method handles the behavior of this node in a fluid network from HBM
      */
     private void handleHBMNode() {
-        if(mode == TankModes.DISABLED.ordinal && this.node != null) {
-            UniNodespace.destroyNode(worldObj, xCoord, yCoord, zCoord, tank.toHBM().getTankType().getNetworkProvider());
+        if (mode == TankModes.DISABLED.ordinal && this.node != null) {
+            UniNodespace.destroyNode(
+                worldObj,
+                xCoord,
+                yCoord,
+                zCoord,
+                tank.toHBM()
+                    .getTankType()
+                    .getNetworkProvider());
             this.node = null;
             return;
         }
 
-        if(!worldObj.isRemote) {
-            if(mode == TankModes.BUFFER.ordinal) {
-                if(this.node == null || this.node.expired || tank.toHBM().getTankType() != lastType) {
+        if (!worldObj.isRemote) {
+            if (mode == TankModes.BUFFER.ordinal) {
+                if (this.node == null || this.node.expired
+                    || tank.toHBM()
+                        .getTankType() != lastType) {
 
-                    this.node = (FluidNode) UniNodespace.getNode(worldObj, xCoord, yCoord, zCoord, tank.toHBM().getTankType().getNetworkProvider());
+                    this.node = (FluidNode) UniNodespace.getNode(
+                        worldObj,
+                        xCoord,
+                        yCoord,
+                        zCoord,
+                        tank.toHBM()
+                            .getTankType()
+                            .getNetworkProvider());
 
-                    if(this.node == null || this.node.expired || tank.toHBM().getTankType() != lastType) {
-                        this.node = this.createNode(tank.toHBM().getTankType());
+                    if (this.node == null || this.node.expired
+                        || tank.toHBM()
+                            .getTankType() != lastType) {
+                        this.node = this.createNode(
+                            tank.toHBM()
+                                .getTankType());
                         UniNodespace.createNode(worldObj, this.node);
-                        lastType = tank.toHBM().getTankType();
+                        lastType = tank.toHBM()
+                            .getTankType();
                     }
                 }
 
-                if(node != null && node.hasValidNet()) {
+                if (node != null && node.hasValidNet()) {
                     node.net.addProvider(this);
                     node.net.addReceiver(this); // TODO fix buffer mode
                 }
             } else {
-                if(this.node != null) {
-                    UniNodespace.destroyNode(worldObj, xCoord, yCoord, zCoord, tank.toHBM().getTankType().getNetworkProvider());
+                if (this.node != null) {
+                    UniNodespace.destroyNode(
+                        worldObj,
+                        xCoord,
+                        yCoord,
+                        zCoord,
+                        tank.toHBM()
+                            .getTankType()
+                            .getNetworkProvider());
                     this.node = null;
                 }
 
-                for(DirPos pos : getConPos()) {
-                    FluidNode dirNode = (FluidNode) UniNodespace.getNode(worldObj, pos.getX(), pos.getY(), pos.getZ(), tank.toHBM().getTankType().getNetworkProvider());
+                for (DirPos pos : getConPos()) {
+                    FluidNode dirNode = (FluidNode) UniNodespace.getNode(
+                        worldObj,
+                        pos.getX(),
+                        pos.getY(),
+                        pos.getZ(),
+                        tank.toHBM()
+                            .getTankType()
+                            .getNetworkProvider());
 
-                    if(mode == TankModes.SENDER.ordinal) {
+                    if (mode == TankModes.SENDER.ordinal) {
                         tryProvide(tank.toHBM(), worldObj, pos.getX(), pos.getY(), pos.getZ(), pos.getDir());
                     } else {
-                        if(dirNode != null && dirNode.hasValidNet()) dirNode.net.removeProvider(this);
+                        if (dirNode != null && dirNode.hasValidNet()) dirNode.net.removeProvider(this);
                     }
 
-                    if(mode == TankModes.RECEIVER.ordinal) {
-                        if(dirNode != null && dirNode.hasValidNet()) dirNode.net.addReceiver(this);
+                    if (mode == TankModes.RECEIVER.ordinal) {
+                        if (dirNode != null && dirNode.hasValidNet()) dirNode.net.addReceiver(this);
                     } else {
-                        if(dirNode != null && dirNode.hasValidNet()) dirNode.net.removeReceiver(this);
+                        if (dirNode != null && dirNode.hasValidNet()) dirNode.net.removeReceiver(this);
                     }
                 }
             }
@@ -229,12 +266,13 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
 
         HashSet<BlockPos> posSet = new HashSet<BlockPos>();
         posSet.add(new BlockPos(this));
-        for(DirPos pos : conPos) {
+        for (DirPos pos : conPos) {
             ForgeDirection dir = pos.getDir();
             posSet.add(new BlockPos(pos.getX() - dir.offsetX, pos.getY() - dir.offsetY, pos.getZ() - dir.offsetZ));
         }
 
-        return new FluidNode(type.getNetworkProvider(), posSet.toArray(new BlockPos[posSet.size()])).setConnections(conPos);
+        return new FluidNode(type.getNetworkProvider(), posSet.toArray(new BlockPos[posSet.size()]))
+            .setConnections(conPos);
     }
 
     @Override
@@ -246,7 +284,7 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
     private void handleItemInput() {
         ItemStack stackIn = this.getStackInSlot(0);
 
-        if (stackIn == null){
+        if (stackIn == null) {
             operationDelay = OPERATION_TIME_TICKS;
             return;
         }
@@ -259,23 +297,28 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
                 handleFluidContainer(stackIn);
             } else if (stackIn.getItem() instanceof ItemFluidTank) {
                 handleFullHBMTank(stackIn);
-            } else if (com.hbm.inventory.FluidContainerRegistry.getFullContainer(stackIn, tank.toHBM().getTankType()) != null) {
-                // Case of an empty container from HBM
-                handleEmptyHBMTank(stackIn);
-            } else if (stackIn.getItem() instanceof IItemFluidIdentifier) {
-                handleFluidIdentifier(stackIn);
-            }
+            } else if (com.hbm.inventory.FluidContainerRegistry.getFullContainer(
+                stackIn,
+                tank.toHBM()
+                    .getTankType())
+                != null) {
+                    // Case of an empty container from HBM
+                    handleEmptyHBMTank(stackIn);
+                } else if (stackIn.getItem() instanceof IItemFluidIdentifier) {
+                    handleFluidIdentifier(stackIn);
+                }
         } else {
             operationDelay--;
         }
     }
 
-    ///  FLUID HANDLING ///
+    /// FLUID HANDLING ///
 
     private void handleFluidIdentifier(ItemStack stackIn) {
         assert stackIn.getItem() instanceof IItemFluidIdentifier;
-        FluidType type = ((IItemFluidIdentifier)stackIn.getItem()).getType(null, 0, 0, 0, stackIn);
-        tank.toHBM().setTankType(type);
+        FluidType type = ((IItemFluidIdentifier) stackIn.getItem()).getType(null, 0, 0, 0, stackIn);
+        tank.toHBM()
+            .setTankType(type);
         setInventorySlotContents(0, null);
         setInventorySlotContents(1, stackIn);
         markDirtyAndUpdate();
@@ -369,10 +412,10 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
         markDirtyAndUpdate();
     }
 
-    private void transferTankToContainer(ItemStack stackIn, IFluidContainerItem container, @Nullable FluidStack containerFluid) {
-        int space = containerFluid == null
-                ? container.getCapacity(stackIn)
-                : container.getCapacity(stackIn) - containerFluid.amount;
+    private void transferTankToContainer(ItemStack stackIn, IFluidContainerItem container,
+        @Nullable FluidStack containerFluid) {
+        int space = containerFluid == null ? container.getCapacity(stackIn)
+            : container.getCapacity(stackIn) - containerFluid.amount;
 
         if (space <= 0 || tank.getFill() <= 0) {
             return;
@@ -399,7 +442,11 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
         int fluidAmount = com.hbm.inventory.FluidContainerRegistry.getFluidContent(tankIn, storedFluid);
         UnifiedFluidStack stackToTransfer = UnifiedFluidStack.fromHBM(storedFluid, fluidAmount);
 
-        if (!canFill(ForgeDirection.UP, stackToTransfer.toForge().getFluid())) return;
+        if (!canFill(
+            ForgeDirection.UP,
+            stackToTransfer.toForge()
+                .getFluid()))
+            return;
         transferHBMContainerToTank(tankIn, stackToTransfer);
     }
 
@@ -427,12 +474,22 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
 
     // Transfer from universal tank to HBM portable tank
     private void handleEmptyHBMTank(ItemStack stackIn) {
-        ItemStack fullContainer = com.hbm.inventory.FluidContainerRegistry.getFullContainer(stackIn, tank.toHBM().getTankType());
-        int toTransfer = com.hbm.inventory.FluidContainerRegistry.getFluidContent(fullContainer, tank.toHBM().getTankType());
+        ItemStack fullContainer = com.hbm.inventory.FluidContainerRegistry.getFullContainer(
+            stackIn,
+            tank.toHBM()
+                .getTankType());
+        int toTransfer = com.hbm.inventory.FluidContainerRegistry.getFluidContent(
+            fullContainer,
+            tank.toHBM()
+                .getTankType());
         FluidType storedFluid = Fluids.fromID(fullContainer.getItemDamage());
         UnifiedFluidStack stackToTransfer = UnifiedFluidStack.fromHBM(storedFluid, toTransfer);
 
-        if (!canDrain(ForgeDirection.UP, stackToTransfer.toForge().getFluid())) return;
+        if (!canDrain(
+            ForgeDirection.UP,
+            stackToTransfer.toForge()
+                .getFluid()))
+            return;
         transferTankToHBMContainer(stackIn, stackToTransfer);
     }
 
@@ -449,7 +506,10 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
         else this.setInventorySlotContents(0, stackIn);
 
         if (out == null) {
-            ItemStack fullContainer = com.hbm.inventory.FluidContainerRegistry.getFullContainer(stackIn, tank.toHBM().getTankType());
+            ItemStack fullContainer = com.hbm.inventory.FluidContainerRegistry.getFullContainer(
+                stackIn,
+                tank.toHBM()
+                    .getTankType());
             setInventorySlotContents(1, fullContainer);
         } else {
             out.stackSize++;
@@ -496,7 +556,7 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
         if (resource == null) return 0;
         if (!canFill(from, resource.getFluid())) return 0;
         int filled = tank.fill(UnifiedFluidStack.fromForge(resource), doFill);
-        if(filled > 0 && doFill) this.markDirtyAndUpdate();
+        if (filled > 0 && doFill) this.markDirtyAndUpdate();
         return filled;
     }
 
@@ -526,7 +586,8 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
     @Override
     public boolean canFill(ForgeDirection from, Fluid fluid) {
         FluidType incomingFluid = ModFluidRegistry.getHBMFluid(fluid);
-        FluidType storedFluid = tank.toHBM().getTankType();
+        FluidType storedFluid = tank.toHBM()
+            .getTankType();
 
         if (incomingFluid == null) return false;
         if (incomingFluid.getID() == Fluids.NONE.getID()) return false;
@@ -537,15 +598,20 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
     @Override
     public boolean canDrain(ForgeDirection from, Fluid fluid) {
         if (fluid == null) return false;
-        return tank.toHBM().getTankType().getID() == ModFluidRegistry.getHBMFluid(fluid).getID();
+        return tank.toHBM()
+            .getTankType()
+            .getID()
+            == ModFluidRegistry.getHBMFluid(fluid)
+                .getID();
     }
 
     @Override
     public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-        return new FluidTankInfo[]{tank.toForge().getInfo()};
+        return new FluidTankInfo[] { tank.toForge()
+            .getInfo() };
     }
 
-    ///  INVENTORY HANDLING ///
+    /// INVENTORY HANDLING ///
 
     @Override
     public int getSizeInventory() {
@@ -595,7 +661,7 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
      */
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if(slots[slot] != null) {
+        if (slots[slot] != null) {
             ItemStack stack = slots[slot];
             slots[slot] = null;
             return stack;
@@ -607,7 +673,7 @@ public class TileEntityUniversalTank extends TileEntityLoadedBase implements IIn
     @Override
     public void setInventorySlotContents(int slot, ItemStack itemStack) {
         slots[slot] = itemStack;
-        if(itemStack != null && itemStack.stackSize > this.getInventoryStackLimit()) {
+        if (itemStack != null && itemStack.stackSize > this.getInventoryStackLimit()) {
             itemStack.stackSize = this.getInventoryStackLimit();
         }
     }

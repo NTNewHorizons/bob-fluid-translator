@@ -2,10 +2,10 @@ package com.ezzo.fluidtranslator;
 
 public enum TankModes {
 
-    RECEIVER (0),
-    BUFFER (1),
-    SENDER (2),
-    DISABLED (3);
+    RECEIVER(0),
+    BUFFER(1),
+    SENDER(2),
+    DISABLED(3);
 
     public final int ordinal;
 
